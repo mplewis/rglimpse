@@ -107,16 +107,19 @@ func main() {
 		merged := []map[string]interface{}{}
 		for _, stat := range subset {
 			one := map[string]interface{}{
-				"hash":      stat.Torrent.Hash,
-				"name":      stat.Torrent.Name,
-				"path":      stat.Torrent.Path,
-				"size":      stat.Torrent.Size,
-				"label":     stat.Torrent.Label,
-				"completed": stat.Torrent.Completed,
-				"ratio":     stat.Torrent.Ratio,
-				"created":   stat.Torrent.Created,
-				"started":   stat.Torrent.Started,
-				"finished":  stat.Torrent.Finished,
+				"hash":            stat.Torrent.Hash,
+				"name":            stat.Torrent.Name,
+				"path":            stat.Torrent.Path,
+				"size":            stat.Torrent.Size,
+				"label":           stat.Torrent.Label,
+				"completed":       stat.Torrent.Completed,
+				"ratio":           stat.Torrent.Ratio,
+				"created":         stat.Torrent.Created,
+				"started":         stat.Torrent.Started,
+				"finished":        stat.Torrent.Finished,
+				"completed_bytes": stat.Status.CompletedBytes,
+				"down_rate":       stat.Status.DownRate,
+				"up_rate":         stat.Status.UpRate,
 			}
 			merged = append(merged, one)
 		}

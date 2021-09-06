@@ -9,5 +9,6 @@ require (
 
 require (
 	github.com/gammazero/deque v0.1.0 // indirect
+	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/pkg/errors v0.8.1 // indirect
 )

@@ -5,6 +5,24 @@ import en_short from 'timeago.js/lib/lang/en_short'
 import bytes from 'bytes'
 
 timeago.register('en_short', en_short)
+timeago.register('en_short_no_ago', function (_: any, index: any): any {
+  return [
+    ['just now', 'soon'],
+    ['%ss', '%ss'],
+    ['1m', '1m'],
+    ['%sm', '%sm'],
+    ['1h', '1h'],
+    ['%sh', '%sh'],
+    ['1d', '1d'],
+    ['%sd', '%sd'],
+    ['1w', '1w'],
+    ['%sw', '%sw'],
+    ['1mo', '1mo'],
+    ['%smo', '%smo'],
+    ['1yr', '1yr'],
+    ['%syr', '%syr'],
+  ][index];
+})
 
 const props = defineProps<{
   host: string,
@@ -41,7 +59,7 @@ function eta(t: Torrent): Date {
 }
 
 function size(bytez: number): string {
-  return bytes(bytez, { unitSeparator: ' ' })
+  return bytes(bytez, { unitSeparator: ' ', decimalPlaces: 1, fixedDecimals: true })
 }
 
 function parse(raw: { [k: string]: any }): Torrent {
@@ -62,6 +80,38 @@ function parse(raw: { [k: string]: any }): Torrent {
   }
 }
 
+
+const wip = {
+  completed: false,
+  completed_bytes: 291.56 * 1024 * 1024,
+  created: new Date(0),
+  down_rate: 75400,
+  finished: new Date(0),
+  hash: 'some-hash-a',
+  label: '',
+  name: '[SubsPlease] Hamefura S2 - 10 (1080p) [72AC493A].mkv',
+  path: '/path/to/my/torrent',
+  ratio: 0.108,
+  size: 378.812 * 1024 * 1024,
+  started: new Date(Date.now() - 1000 * 60 * 10),
+  up_rate: 100,
+}
+const done = {
+  completed: true,
+  completed_bytes: 18.32 * 1024 * 1024 * 1024,
+  created: new Date(0),
+  down_rate: 100,
+  finished: new Date(Date.now() - 1000 * 30),
+  hash: 'some-hash-a',
+  label: '',
+  name: 'La.La.Land.2016.UHD.BluRay.Remux.2160p.HEVC.HDR.Atmos.7.1-HiFi',
+  path: '/path/to/my/torrent',
+  ratio: 0.081,
+  size: 40 * 1024 * 1024,
+  started: new Date(Date.now() - 1000 * 60 * 20),
+  up_rate: 128.52 * 1024,
+}
+
 async function fetchPage(page: number) {
   // try {
   //   loading.value = true
@@ -78,38 +128,10 @@ async function fetchPage(page: number) {
   //   loading.value = false
   // }
 
-  torrents.value = [
-    {
-      completed: false,
-      completed_bytes: 10 * 1024 * 1024,
-      created: new Date(0),
-      down_rate: 100,
-      finished: new Date(0),
-      hash: 'some-hash-a',
-      label: '',
-      name: '[SubsPlease] Hamefura S2 - 10 (1080p) [72AC493A].mkv',
-      path: '/path/to/my/torrent',
-      ratio: 0.5,
-      size: 40 * 1024 * 1024,
-      started: new Date(Date.now() - 1000 * 60 * 10),
-      up_rate: 100,
-    },
-    {
-      completed: true,
-      completed_bytes: 40 * 1024 * 1024,
-      created: new Date(0),
-      down_rate: 100,
-      finished: new Date(Date.now() - 1000 * 30),
-      hash: 'some-hash-a',
-      label: '',
-      name: 'La.La.Land.2016.UHD.BluRay.Remux.2160p.HEVC.HDR.Atmos.7.1-HiFi',
-      path: '/path/to/my/torrent',
-      ratio: 0.5,
-      size: 40 * 1024 * 1024,
-      started: new Date(Date.now() - 1000 * 60 * 20),
-      up_rate: 100,
-    },
-  ]
+  torrents.value = [wip, wip, wip]
+  for (let x = 0; x < 90; x++) {
+    torrents.value.push(done)
+  }
   total.value = torrents.value.length
   loading.value = false
 }
@@ -124,60 +146,64 @@ onMounted(() => {
 })
 
 function prettyDate(date: Date): string {
-  return timeago.format(date, 'en_short')
+  return timeago.format(date, 'en_short_no_ago')
 }
-
-
 </script>
 
 <template>
-  <div class="mx-3">
-    <h1 class="is-size-3 mb-3">rglimpse</h1>
-    <div v-if="error">
-      <p>Sorry, something went wrong:</p>
-      <pre class="my-3"><code>{{ error.toString() }}</code></pre>
-      <p>Try refreshing the page.</p>
+  <h1 class="is-size-3 mb-3">rglimpse</h1>
+  <div v-if="error">
+    <p>Sorry, something went wrong:</p>
+    <pre class="my-3"><code>{{ error.toString() }}</code></pre>
+    <p>Try refreshing the page.</p>
+  </div>
+
+  <div v-else>
+    <div class="flex mb-4" v-if="total">
+      <button class="button is-primary" @click="diffPage(-1)" :disabled="page <= 1">&laquo;</button>
+      Page {{ page }} of {{ Math.ceil(total / perPage) }}
+      <button
+        class="button is-primary"
+        @click="diffPage(1)"
+        :disabled="page >= Math.ceil(total / perPage)"
+      >&raquo;</button>
     </div>
 
-    <div v-else>
-      <div class="flex mb-3" v-if="total">
-        <button class="button" @click="diffPage(-1)" :disabled="page <= 1">&laquo;</button>
-        Page {{ page }} of {{ Math.ceil(total / perPage) }}
-        <button
-          class="button"
-          @click="diffPage(1)"
-          :disabled="page >= Math.ceil(total / perPage)"
-        >&raquo;</button>
+    <div v-if="loading">Loading...</div>
+    <div
+      v-else
+      v-for="torrent in torrents"
+      :key="torrent.hash"
+      :class="{ 'torrent-card': true, 'mb-3': true, 'p-3': true, 'complete': torrent.completed }"
+    >
+      <div v-if="torrent.completed" class="complete">
+        <div class="name has-text-weight-bold">{{ torrent.name }}</div>
+        <div class="my-2">
+          <progress :value="1" :max="1" />
+        </div>
+        <div class="flex">
+          <div>UL: {{ size(torrent.up_rate) }}/s</div>
+          <div>{{ size(torrent.completed_bytes) }}</div>
+          <div class="ratio">Ratio: {{ torrent.ratio }}</div>
+        </div>
       </div>
 
-      <div v-if="loading">Loading...</div>
-      <div
-        v-else
-        v-for="torrent in torrents"
-        :key="torrent.hash"
-        :class="{ 'torrent-card': true, 'mb-3': true, 'p-3': true, 'complete': torrent.completed }"
-      >
-        <div v-if="torrent.completed" class="complete">
-          <div class="name has-text-weight-bold">{{ torrent.name }}</div>
-          <div class="flex">
-            <div class="ratio">Ratio: {{ torrent.ratio }}</div>
-            <div>{{ size(torrent.completed_bytes) }} total</div>
-            <div :title="torrent.finished.toString()">Done {{ prettyDate(torrent.finished) }}</div>
-          </div>
+      <div v-else class="incomplete">
+        <div class="name has-text-weight-bold mb-2">{{ torrent.name }}</div>
+        <div class="flex">
+          <div>{{ size(torrent.size - torrent.completed_bytes) }} left</div>
+          <span :title="eta(torrent).toString()">
+            ETA:
+            <span class="has-text-weight-bold">{{ prettyDate(eta(torrent)) }}</span>
+          </span>
         </div>
-
-        <div v-else class="incomplete">
-          <div class="name has-text-weight-bold">{{ torrent.name }}</div>
-          <div class="flex">
-            <span :title="torrent.started.toString()">{{ prettyDate(torrent.started) }}</span>
-            <div>{{ size(torrent.down_rate) }}/s down</div>
-            <span :title="eta(torrent).toString()">{{ prettyDate(eta(torrent)) }}</span>
-          </div>
-          <div class="flex">
-            <div>{{ size(torrent.completed_bytes) }} done</div>
-            <div>{{ size(torrent.size) }} total</div>
-            <div>{{ size(torrent.size - torrent.completed_bytes) }} left</div>
-          </div>
+        <div class="my-2">
+          <progress :value="torrent.completed_bytes" :max="torrent.size" />
+        </div>
+        <div class="flex">
+          <div>DL: {{ size(torrent.down_rate) }}/s</div>
+          <div class>{{ size(torrent.size) }}</div>
+          <div class="ratio">Ratio: {{ torrent.ratio }}</div>
         </div>
       </div>
     </div>
@@ -185,18 +211,52 @@ function prettyDate(date: Date): string {
 </template>
 
 <style lang="scss" scoped>
+@import "../colors.scss";
+
+button {
+  background-color: $button-color !important;
+}
+
 .torrent-card {
   border-radius: 6px;
-  color: white;
-  background-color: blue;
+  background-color: $torrent-unfinished-color;
 
   &.complete {
-    background-color: green;
+    background-color: $torrent-finished-color;
   }
 }
 
 .name {
   word-break: break-word;
+}
+
+$progress-height: 8px;
+
+.progress-container {
+  justify-content: left;
+  align-items: center;
+  display: flex;
+}
+progress,
+progress[role] {
+  height: $progress-height;
+  width: 100%;
+  background: $progress-background-color;
+  border-radius: $progress-height / 2;
+  border: none;
+  display: block;
+}
+progress[value]::-webkit-progress-bar {
+  background: $progress-background-color;
+  border-radius: $progress-height / 2;
+}
+progress[value]::-moz-progress-bar {
+  background: $progress-foreground-color;
+  border-radius: $progress-height / 2;
+}
+progress[value]::-webkit-progress-value {
+  background: $progress-foreground-color;
+  border-radius: $progress-height / 2;
 }
 </style>
 

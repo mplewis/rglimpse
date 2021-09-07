@@ -9,7 +9,20 @@ App.use(PrimeVue);
 </script>
 
 <template>
-  <div class="container mx-auto my-5">
+  <div class="container base mx-3">
     <Main host="http://localhost:9081" perPage="10" />
   </div>
 </template>
+
+<style lang="scss">
+@import "./colors.scss";
+
+* {
+  color: $text-color;
+}
+
+html {
+  background-color: $background-color;
+  height: 100%;
+}
+</style>

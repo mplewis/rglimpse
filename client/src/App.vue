@@ -17,8 +17,8 @@ App.use(PrimeVue);
 <style lang="scss">
 @import "./colors.scss";
 
-* {
-  color: $text-color;
+body {
+  color: $text-primary-color;
 }
 
 html {

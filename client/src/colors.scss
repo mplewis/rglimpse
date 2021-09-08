@@ -1,7 +1,14 @@
-$text-color: white;
-$background-color: rgb(25, 37, 54);
-$torrent-unfinished-color: rgb(25, 84, 161);
-$torrent-finished-color: rgb(25, 155, 75);
+$text-primary-color: white;
+$text-secondary-color: rgba(255, 255, 255, 0.9);
+
 $button-color: rgb(43, 135, 255);
 $progress-background-color: rgba(0, 0, 0, 0.4);
 $progress-foreground-color: white;
+
+$background-color: rgb(25, 37, 54);
+$torrent-unfinished-color: rgb(25, 84, 161);
+$torrent-finished-color: rgb(25, 155, 75);
+
+$background-color-accessible: rgb(23, 33, 49);
+$torrent-unfinished-color-accessible: rgb(146, 78, 0);
+$torrent-finished-color-accessible: rgb(25, 70, 129);

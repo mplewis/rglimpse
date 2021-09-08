@@ -30,11 +30,14 @@ const props = defineProps<{
 }>()
 const perPage = parseInt(props.perPage)
 
-const loading = ref<boolean>(false)
+const loading = ref<boolean>(true)
 const error = ref<any>(null)
 const page = ref<number>(1)
 const total = ref<number>(0)
 const torrents = ref<Torrent[]>([])
+
+const showSettings = ref<boolean>(false)
+const accessibleColor = ref<boolean>(false)
 
 type Torrent = {
   completed: boolean,
@@ -129,7 +132,7 @@ async function fetchPage(page: number) {
   // }
 
   torrents.value = [wip, wip, wip]
-  for (let x = 0; x < 90; x++) {
+  for (let x = 0; x < 7; x++) {
     torrents.value.push(done)
   }
   total.value = torrents.value.length
@@ -151,7 +154,22 @@ function prettyDate(date: Date): string {
 </script>
 
 <template>
-  <h1 class="is-size-3 mb-3">rglimpse</h1>
+  <div v-if="showSettings" class="settings p-4">
+    <div class="button-holder">
+      <button class="button is-primary is-small" @click="showSettings = false">&cross;</button>
+    </div>
+    <h1 class="has-text-weight-bold is-size-5 mb-2">Settings</h1>
+    <div class="mt-1">
+      <input type="checkbox" class="checkbox" id="accessible-color" v-model="accessibleColor" />
+      <label for="accessible-color" class="ml-2">Use accessible (colorblind) colors</label>
+    </div>
+  </div>
+
+  <div class="flex">
+    <h1 class="appname is-size-3 mb-3" @click="showSettings = true">rglimpse</h1>
+    <p v-if="loading">Loading...</p>
+  </div>
+
   <div v-if="error">
     <p>Sorry, something went wrong:</p>
     <pre class="my-3"><code>{{ error.toString() }}</code></pre>
@@ -161,7 +179,7 @@ function prettyDate(date: Date): string {
   <div v-else>
     <div class="flex mb-4" v-if="total">
       <button class="button is-primary" @click="diffPage(-1)" :disabled="page <= 1">&laquo;</button>
-      Page {{ page }} of {{ Math.ceil(total / perPage) }}
+      {{ (page - 1) * perPage + 1 }}–{{ page * perPage }} of {{ total }}
       <button
         class="button is-primary"
         @click="diffPage(1)"
@@ -169,19 +187,18 @@ function prettyDate(date: Date): string {
       >&raquo;</button>
     </div>
 
-    <div v-if="loading">Loading...</div>
     <div
-      v-else
+      v-if="!loading"
       v-for="torrent in torrents"
       :key="torrent.hash"
       :class="{ 'torrent-card': true, 'mb-3': true, 'p-3': true, 'complete': torrent.completed }"
     >
       <div v-if="torrent.completed" class="complete">
         <div class="name has-text-weight-bold">{{ torrent.name }}</div>
-        <div class="my-2">
+        <div class="my-2 status-text">
           <progress :value="1" :max="1" />
         </div>
-        <div class="flex">
+        <div class="flex status-text">
           <div>UL: {{ size(torrent.up_rate) }}/s</div>
           <div>{{ size(torrent.completed_bytes) }}</div>
           <div class="ratio">Ratio: {{ torrent.ratio }}</div>
@@ -190,19 +207,19 @@ function prettyDate(date: Date): string {
 
       <div v-else class="incomplete">
         <div class="name has-text-weight-bold mb-2">{{ torrent.name }}</div>
-        <div class="flex">
+        <div class="flex status-text">
           <div>{{ size(torrent.size - torrent.completed_bytes) }} left</div>
           <span :title="eta(torrent).toString()">
             ETA:
-            <span class="has-text-weight-bold">{{ prettyDate(eta(torrent)) }}</span>
+            <span class="primary-text">{{ prettyDate(eta(torrent)) }}</span>
           </span>
         </div>
         <div class="my-2">
           <progress :value="torrent.completed_bytes" :max="torrent.size" />
         </div>
-        <div class="flex">
+        <div class="flex status-text">
           <div>DL: {{ size(torrent.down_rate) }}/s</div>
-          <div class>{{ size(torrent.size) }}</div>
+          <div>{{ size(torrent.size) }}</div>
           <div class="ratio">Ratio: {{ torrent.ratio }}</div>
         </div>
       </div>
@@ -213,8 +230,35 @@ function prettyDate(date: Date): string {
 <style lang="scss" scoped>
 @import "../colors.scss";
 
+.appname {
+  cursor: pointer;
+}
+
+.settings {
+  position: fixed;
+  background: $background-color;
+  border-radius: 6px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 1);
+  z-index: 1;
+  top: 20px;
+  left: 20px;
+
+  .button-holder {
+    text-align: right;
+    height: 0;
+  }
+}
+
 button {
   background-color: $button-color !important;
+}
+
+.status-text {
+  color: $text-secondary-color;
+}
+.primary-text {
+  color: $text-primary-color;
+  font-weight: bold;
 }
 
 .torrent-card {

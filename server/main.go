@@ -32,7 +32,7 @@ func main() {
 	// 	log.Panic(err)
 	// }
 	// defer file.Close()
-	// encoder := gob.NewEncoder(file)
+	// // encoder := gob.NewEncoder(file)
 
 	// torrs, err := conn.GetTorrents(rtorrent.ViewMain)
 	// if err != nil {
@@ -40,7 +40,7 @@ func main() {
 	// }
 
 	// wp := workerpool.New(32)
-	// done := make(chan Stat)
+	// done := make(chan types.Stat)
 	// remaining := len(torrs)
 	// for _, torr := range torrs {
 	// 	torr := torr
@@ -50,7 +50,7 @@ func main() {
 	// 		if err != nil {
 	// 			log.Panic(err)
 	// 		}
-	// 		done <- Stat{torr, stat}
+	// 		done <- types.Stat{Torrent: torr, Status: stat}
 	// 		remaining -= 1
 	// 		fmt.Println(remaining)
 	// 		if remaining == 0 {
@@ -59,7 +59,7 @@ func main() {
 	// 	})
 	// }
 
-	// stats := []Stat{}
+	// stats := []types.Stat{}
 	// for result := range done {
 	// 	stats = append(stats, result)
 	// 	fmt.Println(result.Torrent.Pretty())
@@ -77,17 +77,6 @@ func main() {
 	decoder.Decode(&stats)
 
 	newest := sorts.SortStatsByAdded(stats, sorts.Descending)
-
-	// for i, stat := range newest {
-	// 	// Merge stat.torrent and stat.stat into one struct.
-	// 	merged = map[string]interface{}{}
-	// 	for k, v := range stat.Torrent {
-	// 		merged[k] = v
-	// 	}
-	// 	for k, v := range stat.Stat {
-	// 		merged[k] = v
-	// 	}
-	// }
 
 	r := mux.NewRouter()
 	r.HandleFunc("/torrents", func(w http.ResponseWriter, r *http.Request) {

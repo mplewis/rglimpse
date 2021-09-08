@@ -115,28 +115,29 @@ const done = {
   up_rate: 128.52 * 1024,
 }
 
+// TODO: Auto refresh
 async function fetchPage(page: number) {
-  // try {
-  //   loading.value = true
-  //   const count = parseInt(props.perPage)
-  //   const offset = (page - 1) * count
-  //   const resp = await fetch(`${props.host}/torrents?offset=${offset}&count=${count}`)
-  //   const data = await resp.json()
-  //   total.value = data.total
-  //   torrents.value = data.torrents.map(parse)
-  // } catch (e) {
-  //   console.log(e)
-  //   error.value = e
-  // } finally {
-  //   loading.value = false
-  // }
-
-  torrents.value = [wip, wip, wip]
-  for (let x = 0; x < 7; x++) {
-    torrents.value.push(done)
+  try {
+    loading.value = true
+    const count = parseInt(props.perPage)
+    const offset = (page - 1) * count
+    const resp = await fetch(`${props.host}/torrents?offset=${offset}&count=${count}`)
+    const data = await resp.json()
+    total.value = data.total
+    torrents.value = data.torrents.map(parse)
+  } catch (e) {
+    console.log(e)
+    error.value = e
+  } finally {
+    loading.value = false
   }
-  total.value = torrents.value.length
-  loading.value = false
+
+  // torrents.value = [wip, wip, wip]
+  // for (let x = 0; x < 7; x++) {
+  //   torrents.value.push(done)
+  // }
+  // total.value = torrents.value.length
+  // loading.value = false
 }
 
 function diffPage(diff: number) {
@@ -198,10 +199,10 @@ function prettyDate(date: Date): string {
         <div class="my-2 status-text">
           <progress :value="1" :max="1" />
         </div>
-        <div class="flex status-text">
-          <div>UL: {{ size(torrent.up_rate) }}/s</div>
-          <div>{{ size(torrent.completed_bytes) }}</div>
-          <div class="ratio">Ratio: {{ torrent.ratio }}</div>
+        <div class="columns is-mobile status-text">
+          <div class="column">▲ {{ size(torrent.up_rate) }}/s</div>
+          <div class="column">{{ size(torrent.completed_bytes) }}</div>
+          <div class="column ratio">◕ {{ torrent.ratio }}</div>
         </div>
       </div>
 
@@ -211,16 +212,20 @@ function prettyDate(date: Date): string {
           <div>{{ size(torrent.size - torrent.completed_bytes) }} left</div>
           <span :title="eta(torrent).toString()">
             ETA:
-            <span class="primary-text">{{ prettyDate(eta(torrent)) }}</span>
+            <span
+              class="primary-text"
+              v-if="torrent.down_rate > 0"
+            >{{ prettyDate(eta(torrent)) }}</span>
+            <span class="primary-text" v-else>∞</span>
           </span>
         </div>
         <div class="my-2">
           <progress :value="torrent.completed_bytes" :max="torrent.size" />
         </div>
-        <div class="flex status-text">
-          <div>DL: {{ size(torrent.down_rate) }}/s</div>
-          <div>{{ size(torrent.size) }}</div>
-          <div class="ratio">Ratio: {{ torrent.ratio }}</div>
+        <div class="columns is-mobile status-text">
+          <div class="column">▼ {{ size(torrent.down_rate) }}/s</div>
+          <div class="column">{{ size(torrent.size) }}</div>
+          <div class="column ratio">◕ {{ torrent.ratio }}</div>
         </div>
       </div>
     </div>
@@ -228,7 +233,15 @@ function prettyDate(date: Date): string {
 </template>
 
 <style lang="scss" scoped>
+@use "sass:math";
 @import "../colors.scss";
+
+.column:nth-child(2) {
+  text-align: center;
+}
+.column:nth-child(3) {
+  text-align: right;
+}
 
 .appname {
   cursor: pointer;
@@ -255,6 +268,7 @@ button {
 
 .status-text {
   color: $text-secondary-color;
+  font-size: 14px;
 }
 .primary-text {
   color: $text-primary-color;
@@ -286,26 +300,23 @@ progress[role] {
   height: $progress-height;
   width: 100%;
   background: $progress-background-color;
-  border-radius: $progress-height / 2;
+  border-radius: math.div($progress-height, 2);
   border: none;
   display: block;
 }
 progress[value]::-webkit-progress-bar {
   background: $progress-background-color;
-  border-radius: $progress-height / 2;
+  border-radius: math.div($progress-height, 2);
 }
 progress[value]::-moz-progress-bar {
   background: $progress-foreground-color;
-  border-radius: $progress-height / 2;
+  border-radius: math.div($progress-height, 2);
 }
 progress[value]::-webkit-progress-value {
   background: $progress-foreground-color;
-  border-radius: $progress-height / 2;
+  border-radius: math.div($progress-height, 2);
 }
-</style>
 
-
-<style lang="scss">
 .flex {
   display: flex;
   justify-content: space-between;

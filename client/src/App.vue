@@ -9,8 +9,10 @@ App.use(PrimeVue);
 </script>
 
 <template>
-  <div class="container base mx-3">
-    <Main host="http://localhost:9081" perPage="10" />
+  <div class="container base mx-auto">
+    <div class="mx-3">
+      <Main host="http://localhost:9081" perPage="10" />
+    </div>
   </div>
 </template>
 

@@ -10,6 +10,7 @@ const perPage = parseInt(props.perPage)
 
 const loading = ref<boolean>(true)
 const error = ref<any>(null)
+const name = ref<string | null>(null)
 const page = ref<number>(1)
 const total = ref<number>(0)
 const torrents = ref<Torrent[]>([])
@@ -59,37 +60,6 @@ function parse(raw: { [k: string]: any }): Torrent {
   }
 }
 
-const wip = {
-  completed: false,
-  completed_bytes: 291.56 * 1024 * 1024,
-  created: new Date(0),
-  down_rate: 75400,
-  finished: new Date(0),
-  hash: 'some-hash-a',
-  label: '',
-  name: '[SubsPlease] Hamefura S2 - 10 (1080p) [72AC493A].mkv',
-  path: '/path/to/my/torrent',
-  ratio: 0.108,
-  size: 378.812 * 1024 * 1024,
-  started: new Date(Date.now() - 1000 * 60 * 10),
-  up_rate: 100,
-}
-const done = {
-  completed: true,
-  completed_bytes: 18.32 * 1024 * 1024 * 1024,
-  created: new Date(0),
-  down_rate: 100,
-  finished: new Date(Date.now() - 1000 * 30),
-  hash: 'some-hash-a',
-  label: '',
-  name: 'La.La.Land.2016.UHD.BluRay.Remux.2160p.HEVC.HDR.Atmos.7.1-HiFi',
-  path: '/path/to/my/torrent',
-  ratio: 0.081,
-  size: 40 * 1024 * 1024,
-  started: new Date(Date.now() - 1000 * 60 * 20),
-  up_rate: 128.52 * 1024,
-}
-
 // TODO: auto refresh
 async function fetchTorrents() {
   try {
@@ -103,6 +73,7 @@ async function fetchTorrents() {
     const uri = `${props.host}/${path}`
     const resp = await fetch(uri)
     const data = await resp.json()
+    name.value = data.name
     total.value = data.total
     torrents.value = data.torrents.map(parse)
   } catch (e) {
@@ -149,8 +120,11 @@ watchEffect(() => setQuery(queryRaw.value))
   -->
 
   <div class="flex">
-    <h1 class="appname is-size-3 mb-3" @click="showSettings = true">rglimpse</h1>
-    <p v-if="loading">Loading...</p>
+    <h1 class="app-name is-size-3 mb-3" @click="showSettings = true">rglimpse</h1>
+    <div class="app-state has-text-right">
+      <p v-if="loading">Loading...</p>
+      <p v-else-if="name">{{ name }}</p>
+    </div>
   </div>
 
   <div v-if="error">
@@ -234,7 +208,7 @@ watchEffect(() => setQuery(queryRaw.value))
   text-align: right;
 }
 
-.appname {
+.app-name {
   cursor: pointer;
 }
 

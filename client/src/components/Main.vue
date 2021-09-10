@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watchEffect } from 'vue'
 import * as timeago from 'timeago.js';
 import en_short from 'timeago.js/lib/lang/en_short'
 import bytes from 'bytes'
@@ -35,6 +35,8 @@ const error = ref<any>(null)
 const page = ref<number>(1)
 const total = ref<number>(0)
 const torrents = ref<Torrent[]>([])
+const query = ref<string>()
+const queryRaw = ref<string>()
 
 const showSettings = ref<boolean>(false)
 const accessibleColor = ref<boolean>(false)
@@ -82,7 +84,6 @@ function parse(raw: { [k: string]: any }): Torrent {
     up_rate: raw.up_rate,
   }
 }
-
 
 const wip = {
   completed: false,
@@ -152,9 +153,22 @@ onMounted(() => {
 function prettyDate(date: Date): string {
   return timeago.format(date, 'en_short_no_ago')
 }
+
+// https://decipher.dev/30-seconds-of-typescript/docs/debounce/
+const debounce = (fn: Function, ms = 300) => {
+  let timeoutId: ReturnType<typeof setTimeout>;
+  return function (this: any, ...args: any[]) {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => fn.apply(this, args), ms);
+  };
+};
+
+const setQuery = debounce((q: string) => query.value = q, 300)
+watchEffect(() => setQuery(queryRaw.value))
 </script>
 
 <template>
+  <!--
   <div v-if="showSettings" class="settings p-4">
     <div class="button-holder">
       <button class="button is-primary is-small" @click="showSettings = false">&cross;</button>
@@ -165,6 +179,7 @@ function prettyDate(date: Date): string {
       <label for="accessible-color" class="ml-2">Use accessible (colorblind) colors</label>
     </div>
   </div>
+  -->
 
   <div class="flex">
     <h1 class="appname is-size-3 mb-3" @click="showSettings = true">rglimpse</h1>
@@ -178,6 +193,15 @@ function prettyDate(date: Date): string {
   </div>
 
   <div v-else>
+    <div class="mb-3">
+      <input
+        type="text"
+        class="input search"
+        placeholder="Search for torrents..."
+        v-model="queryRaw"
+      />
+    </div>
+
     <div class="flex mb-4" v-if="total">
       <button class="button is-primary" @click="diffPage(-1)" :disabled="page <= 1">&laquo;</button>
       {{ (page - 1) * perPage + 1 }}–{{ page * perPage }} of {{ total }}
@@ -264,6 +288,10 @@ function prettyDate(date: Date): string {
 
 button {
   background-color: $button-color !important;
+}
+
+input {
+  border-radius: 100px;
 }
 
 .status-text {

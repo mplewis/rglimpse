@@ -13,8 +13,8 @@ const error = ref<any>(null)
 const page = ref<number>(1)
 const total = ref<number>(0)
 const torrents = ref<Torrent[]>([])
-const query = ref<string>()
-const queryRaw = ref<string>()
+const query = ref<string>('')
+const queryRaw = ref<string>('')
 
 const showSettings = ref<boolean>(false)
 const accessibleColor = ref<boolean>(false)
@@ -90,13 +90,19 @@ const done = {
   up_rate: 128.52 * 1024,
 }
 
-// TODO: Auto refresh
-async function fetchPage(page: number) {
+// TODO: auto refresh
+async function fetchTorrents() {
   try {
     loading.value = true
+
     const count = parseInt(props.perPage)
-    const offset = (page - 1) * count
-    const resp = await fetch(`${props.host}/torrents?offset=${offset}&count=${count}`)
+    const offset = (page.value - 1) * count
+    var path = `torrents?offset=${offset}&count=${count}`
+    if (query.value.length > 0) {
+      path = `torrents?offset=${offset}&count=${count}&query=${query}`
+    }
+
+    const resp = await fetch(`${props.host}/${path}`)
     const data = await resp.json()
     total.value = data.total
     torrents.value = data.torrents.map(parse)
@@ -106,22 +112,15 @@ async function fetchPage(page: number) {
   } finally {
     loading.value = false
   }
-
-  // torrents.value = [wip, wip, wip]
-  // for (let x = 0; x < 7; x++) {
-  //   torrents.value.push(done)
-  // }
-  // total.value = torrents.value.length
-  // loading.value = false
 }
 
 function diffPage(diff: number) {
   page.value += diff
-  fetchPage(page.value)
 }
 
-onMounted(() => {
-  fetchPage(1)
+watchEffect(() => {
+  console.log(page.value, query.value)
+  fetchTorrents()
 })
 
 // https://decipher.dev/30-seconds-of-typescript/docs/debounce/

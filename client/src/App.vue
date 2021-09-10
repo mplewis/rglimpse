@@ -1,11 +1,6 @@
 <script setup lang="ts">
-import { createApp } from 'vue'
-import PrimeVue from 'primevue/config';
 import Main from './components/Main.vue'
 import 'bulma/bulma.sass'
-
-const App = createApp({})
-App.use(PrimeVue);
 </script>
 
 <template>

@@ -63,7 +63,11 @@ func Serve(newStats <-chan []Stat) {
 	}()
 
 	r := mux.NewRouter()
+
 	r.HandleFunc("/torrents", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Content-Type", "application/json")
+
 		q := r.URL.Query()
 		count, err := strconv.Atoi(q.Get("count"))
 		if err != nil {
@@ -90,19 +94,14 @@ func Serve(newStats <-chan []Stat) {
 		})
 	})
 
+	// mux handles static files from /static at /
+	r.PathPrefix("/").Handler(http.FileServer(http.Dir("static")))
+
 	host := os.Getenv("HOST")
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "9081"
 	}
-
-	r.Use(func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Header().Set("Access-Control-Allow-Origin", "*")
-			w.Header().Set("Content-Type", "application/json")
-			next.ServeHTTP(w, r)
-		})
-	})
 
 	addr := fmt.Sprintf("%s:%s", host, port)
 	log.Printf("Listening on %s\n", addr)

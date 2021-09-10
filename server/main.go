@@ -76,7 +76,9 @@ func Subscribe(args SubscriptionArgs) (<-chan []Stat, <-chan error) {
 }
 
 func main() {
+	// TODO: args for username, password, host, port, insecure
 	conn := rtorrent.New("http://admin:admin@wintermute:9080/RPC2", false)
+	// TODO: Show waiting message when torrents haven't yet loaded
 	chStats, chErrs := Subscribe(SubscriptionArgs{
 		Connection:      conn,
 		Concurrency:     32,

@@ -93,16 +93,15 @@ const done = {
 // TODO: auto refresh
 async function fetchTorrents() {
   try {
-    loading.value = true
-
     const count = parseInt(props.perPage)
     const offset = (page.value - 1) * count
     var path = `torrents?offset=${offset}&count=${count}`
     if (query.value.length > 0) {
-      path = `torrents?offset=${offset}&count=${count}&query=${query}`
+      path = `torrents?offset=${offset}&count=${count}&query=${query.value}`
     }
 
-    const resp = await fetch(`${props.host}/${path}`)
+    const uri = `${props.host}/${path}`
+    const resp = await fetch(uri)
     const data = await resp.json()
     total.value = data.total
     torrents.value = data.torrents.map(parse)
@@ -119,7 +118,6 @@ function diffPage(diff: number) {
 }
 
 watchEffect(() => {
-  console.log(page.value, query.value)
   fetchTorrents()
 })
 
@@ -173,7 +171,7 @@ watchEffect(() => setQuery(queryRaw.value))
 
     <div class="flex mb-4" v-if="total">
       <button class="button is-primary" @click="diffPage(-1)" :disabled="page <= 1">&laquo;</button>
-      {{ (page - 1) * perPage + 1 }}–{{ page * perPage }} of {{ total }}
+      {{ (page - 1) * perPage + 1 }}–{{ Math.min(page * perPage, total) }} of {{ total }}
       <button
         class="button is-primary"
         @click="diffPage(1)"

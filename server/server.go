@@ -64,19 +64,28 @@ func Serve(newStats <-chan []Stat) {
 
 	r := mux.NewRouter()
 	r.HandleFunc("/torrents", func(w http.ResponseWriter, r *http.Request) {
-		count, err := strconv.Atoi(r.URL.Query().Get("count"))
+		q := r.URL.Query()
+		count, err := strconv.Atoi(q.Get("count"))
 		if err != nil {
 			w.WriteHeader(http.StatusUnprocessableEntity)
 			return
 		}
-		offset, err := strconv.Atoi(r.URL.Query().Get("offset"))
+		offset, err := strconv.Atoi(q.Get("offset"))
 		if err != nil {
 			w.WriteHeader(http.StatusUnprocessableEntity)
 			return
 		}
-		subset := Subset(stats, offset, count)
+
+		var subset []Stat
+		query := q.Get("query")
+		all := stats
+		if query != "" {
+			all = Filter(stats, query)
+		}
+
+		subset = Subset(all, offset, count)
 		json.NewEncoder(w).Encode(map[string]interface{}{
-			"total":    len(stats),
+			"total":    len(all),
 			"torrents": Structure(subset),
 		})
 	})

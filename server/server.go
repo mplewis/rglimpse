@@ -9,6 +9,7 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
+	"github.com/mrobinsn/go-rtorrent/rtorrent"
 )
 
 func Clamp(n int, min int, max int) int {
@@ -54,11 +55,18 @@ func Structure(stats []Stat) []map[string]interface{} {
 	return merged
 }
 
-func Serve(newStats <-chan []Stat) {
+func Serve(conn *rtorrent.RTorrent, newStats <-chan []Stat) {
+	name := ""
 	stats := []Stat{}
 	go func() {
 		for incoming := range newStats {
 			stats = incoming
+
+			n, err := conn.Name()
+			if err != nil {
+				log.Println(err)
+			}
+			name = n
 		}
 	}()
 
@@ -89,6 +97,7 @@ func Serve(newStats <-chan []Stat) {
 
 		subset = Subset(all, offset, count)
 		json.NewEncoder(w).Encode(map[string]interface{}{
+			"name":     name,
 			"total":    len(all),
 			"torrents": Structure(subset),
 		})

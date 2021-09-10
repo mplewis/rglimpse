@@ -1,28 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref, watchEffect } from 'vue'
-import * as timeago from 'timeago.js';
-import en_short from 'timeago.js/lib/lang/en_short'
-import bytes from 'bytes'
-
-timeago.register('en_short', en_short)
-timeago.register('en_short_no_ago', function (_: any, index: any): any {
-  return [
-    ['just now', 'soon'],
-    ['%ss', '%ss'],
-    ['1m', '1m'],
-    ['%sm', '%sm'],
-    ['1h', '1h'],
-    ['%sh', '%sh'],
-    ['1d', '1d'],
-    ['%sd', '%sd'],
-    ['1w', '1w'],
-    ['%sw', '%sw'],
-    ['1mo', '1mo'],
-    ['%smo', '%smo'],
-    ['1yr', '1yr'],
-    ['%syr', '%syr'],
-  ][index];
-})
+import { prettyDate, prettySize } from '../logic/pretty'
 
 const props = defineProps<{
   host: string,
@@ -61,10 +39,6 @@ function eta(t: Torrent): Date {
   const remainingBytes = t.size - t.completed_bytes
   const remainingSecs = remainingBytes / t.down_rate  // down rate is in bytes per sec
   return new Date(Date.now() + remainingSecs * 1000)
-}
-
-function size(bytez: number): string {
-  return bytes(bytez, { unitSeparator: ' ', decimalPlaces: 1, fixedDecimals: true })
 }
 
 function parse(raw: { [k: string]: any }): Torrent {
@@ -150,10 +124,6 @@ onMounted(() => {
   fetchPage(1)
 })
 
-function prettyDate(date: Date): string {
-  return timeago.format(date, 'en_short_no_ago')
-}
-
 // https://decipher.dev/30-seconds-of-typescript/docs/debounce/
 const debounce = (fn: Function, ms = 300) => {
   let timeoutId: ReturnType<typeof setTimeout>;
@@ -224,8 +194,8 @@ watchEffect(() => setQuery(queryRaw.value))
           <progress :value="1" :max="1" />
         </div>
         <div class="columns is-mobile status-text">
-          <div class="column">▲ {{ size(torrent.up_rate) }}/s</div>
-          <div class="column">{{ size(torrent.completed_bytes) }}</div>
+          <div class="column">▲ {{ prettySize(torrent.up_rate) }}/s</div>
+          <div class="column">{{ prettySize(torrent.completed_bytes) }}</div>
           <div class="column ratio">◕ {{ torrent.ratio }}</div>
         </div>
       </div>
@@ -233,7 +203,7 @@ watchEffect(() => setQuery(queryRaw.value))
       <div v-else class="incomplete">
         <div class="name has-text-weight-bold mb-2">{{ torrent.name }}</div>
         <div class="flex status-text">
-          <div>{{ size(torrent.size - torrent.completed_bytes) }} left</div>
+          <div>{{ prettySize(torrent.size - torrent.completed_bytes) }} left</div>
           <span :title="eta(torrent).toString()">
             ETA:
             <span
@@ -247,8 +217,8 @@ watchEffect(() => setQuery(queryRaw.value))
           <progress :value="torrent.completed_bytes" :max="torrent.size" />
         </div>
         <div class="columns is-mobile status-text">
-          <div class="column">▼ {{ size(torrent.down_rate) }}/s</div>
-          <div class="column">{{ size(torrent.size) }}</div>
+          <div class="column">▼ {{ prettySize(torrent.down_rate) }}/s</div>
+          <div class="column">{{ prettySize(torrent.size) }}</div>
           <div class="column ratio">◕ {{ torrent.ratio }}</div>
         </div>
       </div>

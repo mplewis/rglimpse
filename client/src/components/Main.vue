@@ -74,6 +74,7 @@ async function fetchTorrents() {
     name.value = data.name
     total.value = data.total
     torrents.value = data.torrents.map(parse)
+    error.value = null
   } catch (e) {
     console.log(e)
     error.value = e
@@ -89,6 +90,8 @@ function diffPage(diff: number) {
 watchEffect(() => {
   fetchTorrents()
 })
+
+setInterval(fetchTorrents, 5000)
 
 // https://decipher.dev/30-seconds-of-typescript/docs/debounce/
 const debounce = (fn: Function, ms = 300) => {

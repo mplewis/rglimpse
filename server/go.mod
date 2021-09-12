@@ -1,4 +1,4 @@
-module github.com/mplewis/rglimpse
+module github.com/mplewis/rglimpse/server
 
 go 1.17
 

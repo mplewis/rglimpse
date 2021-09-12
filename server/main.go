@@ -10,6 +10,7 @@ import (
 	"github.com/mrobinsn/go-rtorrent/rtorrent"
 )
 
+// GetEnvDefault returns the value of the given env var. If the var is unset, it returns the given default.
 func GetEnvDefault(key string, defaultValue string) string {
 	val := os.Getenv(key)
 	if val == "" {
@@ -18,6 +19,7 @@ func GetEnvDefault(key string, defaultValue string) string {
 	return val
 }
 
+// MustEnv returns the value of the given env var. If the var is unset, it crashes and logs an error.
 func MustEnv(key string) string {
 	val := os.Getenv(key)
 	if val == "" {
@@ -26,6 +28,7 @@ func MustEnv(key string) string {
 	return val
 }
 
+// BoolEnv returns a given true or false value based on whether the given env var was set.
 func BoolEnv(key string, trueVal string, falseVal string) string {
 	val := os.Getenv(key)
 	if val == "" {
@@ -34,6 +37,7 @@ func BoolEnv(key string, trueVal string, falseVal string) string {
 	return trueVal
 }
 
+// IntEnv returns the value of the given env var, parsed as an int. If the var is unset, it returns the given default.
 func IntEnv(key string, defaultValue int) int {
 	raw := os.Getenv(key)
 	if raw == "" {

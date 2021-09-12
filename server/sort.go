@@ -24,6 +24,7 @@ func (x ByIncompleteThenAddedDesc) Less(i int, j int) bool {
 	return x[i].Torrent.Started.After(x[j].Torrent.Started)
 }
 
+// SortStats sorts Stats, incomplete before complete, then by most recent.
 func SortStats(torrs []Stat) []Stat {
 	sorted := make([]Stat, len(torrs))
 	copy(sorted, torrs)

@@ -12,6 +12,7 @@ import (
 	"github.com/mrobinsn/go-rtorrent/rtorrent"
 )
 
+// Clamp constrains a value to a range.
 func Clamp(n int, min int, max int) int {
 	if min > max {
 		min, max = max, min
@@ -26,12 +27,14 @@ func Clamp(n int, min int, max int) int {
 }
 
 // TODO: write tests
+// Subset returns a paged subset of the input Stats slice.
 func Subset(stats []Stat, offset int, count int) []Stat {
 	left := Clamp(offset, 0, len(stats))
 	right := Clamp(offset+count, left, len(stats))
 	return stats[left:right]
 }
 
+// Structure flattens and restructures the data in Stats for the client.
 func Structure(stats []Stat) []map[string]interface{} {
 	merged := []map[string]interface{}{}
 	for _, stat := range stats {
@@ -55,6 +58,7 @@ func Structure(stats []Stat) []map[string]interface{} {
 	return merged
 }
 
+// Serve starts the server for RTorrent stats data.
 func Serve(conn *rtorrent.RTorrent, newStats <-chan []Stat) {
 	name := ""
 	stats := []Stat{}

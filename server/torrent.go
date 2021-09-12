@@ -9,18 +9,21 @@ import (
 	"github.com/mrobinsn/go-rtorrent/rtorrent"
 )
 
+// Stats combine the Torrent and Status structs for full detailed info.
 type Stat struct {
 	Torrent rtorrent.Torrent
 	Status  rtorrent.Status
 }
 
+// SubscriptionArgs is the arguments for a new RTorrent subscription.
 type SubscriptionArgs struct {
 	Connection      *rtorrent.RTorrent
 	Concurrency     int
 	RefreshInterval time.Duration
 }
 
-func every(duration time.Duration, f func()) {
+// Every runs a function immediately, then at every following interval.
+func Every(duration time.Duration, f func()) {
 	go func() {
 		go f()
 		for range time.Tick(duration) {
@@ -29,6 +32,7 @@ func every(duration time.Duration, f func()) {
 	}()
 }
 
+// Subscribe connects to RTorrent and returns channels for periodic updates and any errors.
 func Subscribe(args SubscriptionArgs) (<-chan []Stat, <-chan error) {
 	ch := make(chan []Stat)
 	er := make(chan error)
@@ -36,7 +40,7 @@ func Subscribe(args SubscriptionArgs) (<-chan []Stat, <-chan error) {
 	conn := args.Connection
 	wp := workerpool.New(args.Concurrency)
 
-	every(args.RefreshInterval, func() {
+	Every(args.RefreshInterval, func() {
 		start := time.Now()
 		log.Println("Fetching torrents...")
 		torrs, err := conn.GetTorrents(rtorrent.ViewMain)

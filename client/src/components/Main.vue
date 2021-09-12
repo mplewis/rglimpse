@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { onMounted, ref, watchEffect } from 'vue'
+import { ref, watchEffect } from 'vue'
 import { prettyDate, prettySize } from '../logic/pretty'
 
 const props = defineProps<{
-  host: string,
   perPage: string,
 }>()
 const perPage = parseInt(props.perPage)
@@ -65,13 +64,12 @@ async function fetchTorrents() {
   try {
     const count = parseInt(props.perPage)
     const offset = (page.value - 1) * count
-    var path = `torrents?offset=${offset}&count=${count}`
+    var path = `/torrents?offset=${offset}&count=${count}`
     if (query.value.length > 0) {
-      path = `torrents?offset=${offset}&count=${count}&query=${query.value}`
+      path = `/torrents?offset=${offset}&count=${count}&query=${query.value}`
     }
 
-    const uri = `${props.host}/${path}`
-    const resp = await fetch(uri)
+    const resp = await fetch(path)
     const data = await resp.json()
     name.value = data.name
     total.value = data.total

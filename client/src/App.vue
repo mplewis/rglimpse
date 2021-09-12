@@ -6,7 +6,7 @@ import 'bulma/bulma.sass'
 <template>
   <div class="container base mx-auto">
     <div class="mx-3">
-      <Main host="http://localhost:9081" perPage="10" />
+      <Main perPage="10" />
     </div>
   </div>
 </template>

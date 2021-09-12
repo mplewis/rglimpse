@@ -22,9 +22,9 @@ type SubscriptionArgs struct {
 
 func every(duration time.Duration, f func()) {
 	go func() {
-		f()
+		go f()
 		for range time.Tick(duration) {
-			f()
+			go f()
 		}
 	}()
 }
@@ -38,6 +38,7 @@ func Subscribe(args SubscriptionArgs) (<-chan []Stat, <-chan error) {
 
 	every(args.RefreshInterval, func() {
 		start := time.Now()
+		log.Println("Fetching torrents...")
 		torrs, err := conn.GetTorrents(rtorrent.ViewMain)
 		if err != nil {
 			er <- err
@@ -46,6 +47,7 @@ func Subscribe(args SubscriptionArgs) (<-chan []Stat, <-chan error) {
 
 		wg := sync.WaitGroup{}
 		stats := []Stat{}
+		log.Println("Fetching detailed torrent info...")
 		for _, torr := range torrs {
 			torr := torr
 			wg.Add(1)

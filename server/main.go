@@ -13,8 +13,8 @@ func main() {
 	// TODO: Show waiting message when torrents haven't yet loaded
 	chStats, chErrs := Subscribe(SubscriptionArgs{
 		Connection:      conn,
-		Concurrency:     32,
-		RefreshInterval: time.Second * 15,
+		Concurrency:     16,
+		RefreshInterval: time.Second * 30,
 	})
 
 	log.Println("Subscribed to rTorrent")

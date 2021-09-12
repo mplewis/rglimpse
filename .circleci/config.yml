@@ -1,0 +1,24 @@
+version: 2.1
+
+orbs:
+  docker: circleci/docker@1.6.0
+
+workflows:
+  cicd:
+    jobs:
+      - docker/publish:
+          name: Build Docker image
+          image: $CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
+          deploy: false
+      - docker/publish:
+          name: Publish Docker image
+          image: $CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
+          tag: latest,<< pipeline.git.tag >>
+          update-description: true
+          context:
+            - Docker Hub
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /.*/

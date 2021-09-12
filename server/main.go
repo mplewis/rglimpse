@@ -1,15 +1,50 @@
 package main
 
 import (
+	"fmt"
 	"log"
+	"os"
 	"time"
 
 	"github.com/mrobinsn/go-rtorrent/rtorrent"
 )
 
+func GetEnvDefault(key string, defaultValue string) string {
+	val := os.Getenv(key)
+	if val == "" {
+		return defaultValue
+	}
+	return val
+}
+
+func MustEnv(key string) string {
+	val := os.Getenv(key)
+	if val == "" {
+		log.Fatal("Missing required environment variable: " + key)
+	}
+	return val
+}
+
+func BoolEnv(key string, trueVal string, falseVal string) string {
+	val := os.Getenv(key)
+	if val == "" {
+		return falseVal
+	}
+	return trueVal
+}
+
 func main() {
-	// TODO: args for username, password, host, port, insecure
-	conn := rtorrent.New("http://admin:admin@wintermute:9080/RPC2", false)
+	host := MustEnv("RTORRENT_HOST")
+	port := GetEnvDefault("RTORRENT_PORT", "9080")
+	username := MustEnv("RTORRENT_USERNAME")
+	password := MustEnv("RTORRENT_PASSWORD")
+	http := BoolEnv("RTORRENT_HTTPS", "https", "http")
+
+	connString := fmt.Sprintf("%s://%s:%s@%s:%s/RPC2", http, username, password, host, port)
+	censored := fmt.Sprintf("%s://%s:*****@%s:%s/RPC2", http, username, host, port)
+	log.Printf("Connecting to %s\n", censored)
+
+	conn := rtorrent.New(connString, false)
 	// TODO: Show waiting message when torrents haven't yet loaded
 	chStats, chErrs := Subscribe(SubscriptionArgs{
 		Connection:      conn,
@@ -17,7 +52,6 @@ func main() {
 		RefreshInterval: time.Second * 30,
 	})
 
-	log.Println("Subscribed to rTorrent")
 	go func() { Serve(conn, chStats) }()
 
 	for err := range chErrs {

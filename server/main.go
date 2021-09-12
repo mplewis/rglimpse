@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/mrobinsn/go-rtorrent/rtorrent"
@@ -33,6 +34,18 @@ func BoolEnv(key string, trueVal string, falseVal string) string {
 	return trueVal
 }
 
+func IntEnv(key string, defaultValue int) int {
+	raw := os.Getenv(key)
+	if raw == "" {
+		return defaultValue
+	}
+	val, err := strconv.Atoi(raw)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return val
+}
+
 func main() {
 	host := MustEnv("RTORRENT_HOST")
 	port := GetEnvDefault("RTORRENT_PORT", "9080")
@@ -48,8 +61,8 @@ func main() {
 	// TODO: Show waiting message when torrents haven't yet loaded
 	chStats, chErrs := Subscribe(SubscriptionArgs{
 		Connection:      conn,
-		Concurrency:     16,
-		RefreshInterval: time.Second * 30,
+		Concurrency:     IntEnv("MAX_CLIENTS", 16),
+		RefreshInterval: time.Second * time.Duration(IntEnv("REFRESH_INTERVAL_SECS", 30)),
 	})
 
 	go func() { Serve(conn, chStats) }()

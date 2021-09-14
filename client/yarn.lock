@@ -227,11 +227,6 @@ assert-never@^1.2.1:
   resolved "https://registry.yarnpkg.com/assert-never/-/assert-never-1.2.1.tgz#11f0e363bf146205fb08193b5c7b90f4d1cf44fe"
   integrity sha512-TaTivMB6pYI1kXwrFlEhLeGfOqoDNdTxjCdwRfFFkEA30Eu+k48W34nlok2EYWJfFFzqaEmichdNM7th6M5HNw==
 
-babel-plugin-add-module-exports@^0.2.1:
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/babel-plugin-add-module-exports/-/babel-plugin-add-module-exports-0.2.1.tgz#9ae9a1f4a8dc67f0cdec4f4aeda1e43a5ff65e25"
-  integrity sha1-mumh9KjcZ/DN7E9K7aHkOl/2XiU=
-
 babel-walk@3.0.0-canary-5:
   version "3.0.0-canary-5"
   resolved "https://registry.yarnpkg.com/babel-walk/-/babel-walk-3.0.0-canary-5.tgz#f66ecd7298357aee44955f235a6ef54219104b11"
@@ -595,11 +590,6 @@ merge-source-map@^1.1.0:
   dependencies:
     source-map "^0.6.1"
 
-merge@^2.1.1:
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/merge/-/merge-2.1.1.tgz#59ef4bf7e0b3e879186436e8481c06a6c162ca98"
-  integrity sha512-jz+Cfrg9GWOZbQAnDQ4hlVnQky+341Yk5ru8bZSe6sIDTCIg8n9i/u7hSQGSVOF3C7lH6mGtqjkiT9G4wFLL0w==
-
 minimist@^1.2.0:
   version "1.2.5"
   resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.5.tgz#67d66014b66a6a8aaa0c083c5fd58df4e4e97602"
@@ -895,15 +885,6 @@ util-deprecate@^1.0.2:
   resolved "https://registry.yarnpkg.com/util-deprecate/-/util-deprecate-1.0.2.tgz#450d4dc9fa70de732762fbd2d4a28981419a0ccf"
   integrity sha1-RQ1Nyfpw3nMnYvvS1KKJgUGaDM8=
 
-v-pagination-3@^0.1.6:
-  version "0.1.6"
-  resolved "https://registry.yarnpkg.com/v-pagination-3/-/v-pagination-3-0.1.6.tgz#fa981f6855fd2c4f2a589abd7e97b4ba6762a9c0"
-  integrity sha512-82J8HnEIYtZijn6F3xhyP/ildI5K7Rv4Yu74VNfQWQsiPWTKntgVvZgBH8UPh/lFEjgWxty/M4N+YHvS+YbGzg==
-  dependencies:
-    babel-plugin-add-module-exports "^0.2.1"
-    merge "^2.1.1"
-    vue ">=3.0.0"
-
 vite@^2.5.2:
   version "2.5.3"
   resolved "https://registry.yarnpkg.com/vite/-/vite-2.5.3.tgz#88d40a9efb9bec66bd87a7676c5689f35ff63742"
@@ -1056,7 +1037,7 @@ vue-tsc@^0.2.2:
   dependencies:
     vscode-vue-languageservice "^0.27.0"
 
-vue@>=3.0.0, vue@^3.2.6:
+vue@^3.2.6:
   version "3.2.8"
   resolved "https://registry.yarnpkg.com/vue/-/vue-3.2.8.tgz#9124e4c31ebc9c592b2b9f293df5c9a88a78e944"
   integrity sha512-x7lwdnOSkceHQUXRVVHBaZzcp6v7M2CYtSZH75zZaT1mTjB4plC4KZHKP/5jAvdqOLBHZGwDSMkWXm3YbAufrA==

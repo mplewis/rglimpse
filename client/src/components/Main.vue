@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref, watchEffect } from 'vue'
+import { useStore } from '../store'
 import { prettyDate, prettySize } from '../logic/pretty'
+
+const store = useStore()
 
 const props = defineProps<{
   perPage: string,
@@ -15,9 +18,6 @@ const total = ref<number>(0)
 const torrents = ref<Torrent[]>([])
 const query = ref<string>('')
 const queryRaw = ref<string>('')
-
-const showSettings = ref<boolean>(false)
-const accessibleColor = ref<boolean>(false)
 
 type Torrent = {
   completed: boolean,
@@ -64,9 +64,9 @@ async function fetchTorrents() {
   try {
     const count = parseInt(props.perPage)
     const offset = (page.value - 1) * count
-    var path = `/torrents?offset=${offset}&count=${count}`
+    var path = `http://localhost:9081/torrents?offset=${offset}&count=${count}`
     if (query.value.length > 0) {
-      path = `/torrents?offset=${offset}&count=${count}&query=${query.value}`
+      path = `http://localhost:9081/torrents?offset=${offset}&count=${count}&query=${query.value}`
     }
 
     const resp = await fetch(path)
@@ -107,21 +107,8 @@ watchEffect(() => setQuery(queryRaw.value))
 </script>
 
 <template>
-  <!--
-  <div v-if="showSettings" class="settings p-4">
-    <div class="button-holder">
-      <button class="button is-primary is-small" @click="showSettings = false">&cross;</button>
-    </div>
-    <h1 class="has-text-weight-bold is-size-5 mb-2">Settings</h1>
-    <div class="mt-1">
-      <input type="checkbox" class="checkbox" id="accessible-color" v-model="accessibleColor" />
-      <label for="accessible-color" class="ml-2">Use accessible (colorblind) colors</label>
-    </div>
-  </div>
-  -->
-
   <div class="flex">
-    <h1 class="app-name is-size-3 mb-3" @click="showSettings = true">rglimpse</h1>
+    <h1 class="app-name is-size-3 mb-3" @click="store.commit('togglePrefs')">rglimpse</h1>
     <div class="app-state has-text-right">
       <p v-if="loading">Loading...</p>
       <p v-else-if="name">{{ name }}</p>
@@ -211,21 +198,6 @@ watchEffect(() => setQuery(queryRaw.value))
 
 .app-name {
   cursor: pointer;
-}
-
-.settings {
-  position: fixed;
-  background: $background-color;
-  border-radius: 6px;
-  box-shadow: 0 0 8px rgba(0, 0, 0, 1);
-  z-index: 1;
-  top: 20px;
-  left: 20px;
-
-  .button-holder {
-    text-align: right;
-    height: 0;
-  }
 }
 
 button {

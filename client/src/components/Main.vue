@@ -37,7 +37,6 @@ function parse(raw: { [k: string]: any }): Torrent {
   }
 }
 
-// TODO: auto refresh
 async function fetchTorrents() {
   try {
     const count = parseInt(props.perPage)
@@ -137,7 +136,7 @@ button {
 }
 
 input {
-  border-radius: 100px;
+  border-radius: 100px !important;
 }
 
 .status-text {

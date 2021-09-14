@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watchEffect } from 'vue'
 import { useStore } from '../store'
 
 const store = useStore()
 
-const accessibleColor = ref<boolean>(false)
+const accessibleColors = ref<boolean>(store.state.accessibleColors)
+watchEffect(() => store.commit('setAccessibleColors', accessibleColors.value))
 </script>
 
 <template>
@@ -15,7 +16,7 @@ const accessibleColor = ref<boolean>(false)
       </div>
       <h1 class="has-text-weight-bold is-size-5 mb-2">Settings</h1>
       <div class="mt-1">
-        <input type="checkbox" class="checkbox" id="accessible-color" v-model="accessibleColor" />
+        <input type="checkbox" class="checkbox" id="accessible-color" v-model="accessibleColors" />
         <label for="accessible-color" class="ml-2">Use accessible (colorblind) colors</label>
       </div>
     </div>

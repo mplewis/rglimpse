@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { Torrent } from '../type'
+import { useStore } from '../store'
 import { prettyDate, prettySize } from '../logic/pretty'
+
+const store = useStore()
 
 defineProps<{ torrent: Torrent }>()
 
@@ -12,7 +15,15 @@ function eta(t: Torrent): Date {
 </script>
 
 <template>
-  <div :class="{ 'torrent-card': true, 'mb-3': true, 'p-3': true, 'complete': torrent.completed }">
+  <div
+    :class="{
+      'torrent-card': true,
+      'mb-3': true,
+      'p-3': true,
+      'complete': torrent.completed,
+      'accessible-colors': store.state.accessibleColors,
+    }"
+  >
     <div v-if="torrent.completed">
       <div class="name has-text-weight-bold">{{ torrent.name }}</div>
       <div class="my-2 status-text">
@@ -61,9 +72,15 @@ function eta(t: Torrent): Date {
 .torrent-card {
   border-radius: 6px;
   background-color: $torrent-unfinished-color;
+  &.accessible-colors {
+    background-color: $torrent-unfinished-color-accessible;
+  }
 
   &.complete {
     background-color: $torrent-finished-color;
+    &.accessible-colors {
+      background-color: $torrent-finished-color-accessible;
+    }
   }
 }
 

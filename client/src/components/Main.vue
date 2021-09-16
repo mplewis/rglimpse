@@ -41,9 +41,9 @@ async function fetchTorrents() {
   try {
     const count = parseInt(props.perPage)
     const offset = (page.value - 1) * count
-    var path = `http://localhost:9081/torrents?offset=${offset}&count=${count}`
+    var path = `/torrents?offset=${offset}&count=${count}`
     if (query.value.length > 0) {
-      path = `http://localhost:9081/torrents?offset=${offset}&count=${count}&query=${query.value}`
+      path = `/torrents?offset=${offset}&count=${count}&query=${query.value}`
     }
 
     const resp = await fetch(path)
